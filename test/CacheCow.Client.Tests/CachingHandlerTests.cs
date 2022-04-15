@@ -574,7 +574,7 @@ namespace CacheCow.Client.Tests
         public async Task IncludesRangeHeaderInCacheKey(string url, bool hasVaryHeader)
         {
             var cacheStore = new DictionaryBasedCache();
-            var cachingHandler = new CachingHandler(cacheStore) { InnerHandler = new HttpClientHandler() };
+            var cachingHandler = new CachingHandler(cacheStore) { DefaultVaryHeaders = new[] { "Range" }, InnerHandler = new HttpClientHandler() };
             var client = new HttpClient(cachingHandler);
 
             var request1 = new HttpRequestMessage(HttpMethod.Get, url)

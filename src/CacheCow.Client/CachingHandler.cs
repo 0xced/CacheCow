@@ -49,7 +49,7 @@ namespace CacheCow.Client
             UseConditionalPutPatchDelete = true;
             MustRevalidateByDefault = true;
             VaryHeaderStore = varyHeaderStore;
-            DefaultVaryHeaders = new string[] { HttpHeaderNames.Accept, HttpHeaderNames.Range };
+            DefaultVaryHeaders = new string[] { HttpHeaderNames.Accept };
             ResponseValidator = (response) =>
             {
                 // 13.4

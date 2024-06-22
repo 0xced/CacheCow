@@ -7,7 +7,6 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
 		<PackageReference Include="StackExchange.Redis" Version="2.6.96" />
 	</ItemGroup>
 	<ItemGroup>

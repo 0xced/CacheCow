@@ -8,7 +8,7 @@ using CacheCow.Common;
 namespace CacheCow.Client.FileCacheStore
 {
     /// <summary>
-    /// A simple 'cache-to-file' storage with persistanty over multiple runs.
+    /// A simple 'cache-to-file' storage with persistence over multiple runs.
     /// </summary>
     public class FileStore : ICacheStore
     {
@@ -80,25 +80,27 @@ namespace CacheCow.Client.FileCacheStore
         }
 
         /// <inheritdoc />
-        public async Task<bool> TryRemoveAsync(CacheKey key)
+        public Task<bool> TryRemoveAsync(CacheKey key)
         {
             if (!File.Exists(_pathFor(key)))
             {
-                return false;
+                return Task.FromResult(false);
             }
 
             File.Delete(_pathFor(key));
-            return true;
+            return Task.FromResult(true);
         }
 
 
         /// <inheritdoc />
-        public async Task ClearAsync()
+        public Task ClearAsync()
         {
             foreach (var f in Directory.GetFiles(_cacheRoot))
             {
                 File.Delete(f);
             }
+
+            return Task.CompletedTask;
         }
 
         private string _pathFor(CacheKey key)

@@ -10,10 +10,8 @@ namespace CacheCow.Common
 	{
 		private readonly string _resourceUri;
 		private readonly string _toString;
-		private readonly string _routePattern;
 		private readonly byte[] _hash;
 		private readonly string _hashBase64;
-		private string _domain = null;
 
 		private const string CacheKeyFormat = "{0}-{1}";
 
@@ -27,7 +25,7 @@ namespace CacheCow.Common
 		public CacheKey(string resourceUri, IEnumerable<string> headerValues = null)
 		{
 			_toString = string.Format(CacheKeyFormat, resourceUri, string.Join("-", headerValues));
-			using (var sha1 = new SHA1CryptoServiceProvider())
+			using (var sha1 = SHA1.Create())
 			{
 				_hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(_toString));
 			}

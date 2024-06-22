@@ -18,7 +18,7 @@ namespace CacheCow.Client
         private const string CacheName = "###_IVaryHeaderStore_###";
         private readonly ConcurrentDictionary<string, string[]> _varyHeaderCache = new ConcurrentDictionary<string, string[]>();
 #if NET462
-        private MemoryCache _cache = new MemoryCache(CacheName);  
+        private MemoryCache _cache = new MemoryCache(CacheName);
 #else
         private MemoryCache _cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
 #endif
@@ -38,16 +38,17 @@ namespace CacheCow.Client
         {
 #if NET462
             return _cache.Remove(uri) != null;
-#endif
+#else
             _cache.Remove(uri);
             return true;
+#endif
         }
 
         public void Clear()
         {
             ((IDisposable)_cache).Dispose();
 #if NET462
-            _cache = new MemoryCache(CacheName);  
+            _cache = new MemoryCache(CacheName);
 #else
             _cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
 #endif

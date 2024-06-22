@@ -10,7 +10,7 @@ namespace CacheCow.Server
     /// </summary>
     public class Sha1Hasher : IHasher
     {
-        private SHA256CryptoServiceProvider _sha1 = new SHA256CryptoServiceProvider();       
+        private readonly SHA256 _sha1 = SHA256.Create();
 
         public string ComputeHash(byte[] bytes)
         {

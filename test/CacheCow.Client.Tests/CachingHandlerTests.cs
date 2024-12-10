@@ -529,7 +529,7 @@ namespace CacheCow.Client.Tests
 			return response;
 		}
 
-        [Fact]
+        [SkippableFact(typeof(HttpRequestException))]
         public async Task Issue238_It_cache_even_if_compression_is_on()
         {
             var compressionHandler = new HttpClientHandler();

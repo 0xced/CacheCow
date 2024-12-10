@@ -24,6 +24,7 @@
         <PackageReference Include="Moq" Version="4.20.72" />
 		<PackageReference Include="xunit" Version="2.9.2" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="3.0.0" PrivateAssets="all" />
+		<PackageReference Include="Xunit.SkippableFact" Version="1.5.23" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\CacheCow.Common\CacheCow.Common.csproj" />

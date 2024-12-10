@@ -29,7 +29,7 @@ namespace CacheCow.Client.NatsKeyValueCacheStore.Tests
             return new NatsKeyValueStore(BucketName, options);
         }
 
-        [SkippableFact]
+        [SkippableFact(typeof(HttpRequestException))]
         public async Task AddItemTest()
         {
             var redisStore = GetKeyValueStore();
@@ -43,7 +43,7 @@ namespace CacheCow.Client.NatsKeyValueCacheStore.Tests
             Assert.True(httpResponseMessage2.Headers.GetCacheCowHeader().RetrievedFromCache);
         }
 
-        [SkippableFact]
+        [SkippableFact(typeof(HttpRequestException))]
         public async Task ExceptionTest()
         {
             var redisStore = GetKeyValueStore();
@@ -58,7 +58,7 @@ namespace CacheCow.Client.NatsKeyValueCacheStore.Tests
             Assert.Equal(HttpStatusCode.OK, httpResponseMessage2.StatusCode);
         }
 
-        [SkippableFact]
+        [SkippableFact(typeof(HttpRequestException))]
         public async Task GetValue()
         {
             var redisStore = GetKeyValueStore();
@@ -81,7 +81,7 @@ namespace CacheCow.Client.NatsKeyValueCacheStore.Tests
             testOutput.WriteLine(httpResponseMessage?.ToString() ?? "");
         }
 
-        [SkippableFact]
+        [SkippableFact(typeof(HttpRequestException))]
         public async Task WorksWithMaxAgeZeroAndStillStoresIt()
         {
             var redisStore = GetKeyValueStore();

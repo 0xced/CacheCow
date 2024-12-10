@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using CacheCow.Client.Headers;
 using Xunit;
@@ -29,7 +30,7 @@ namespace CacheCow.Client.FileCacheStore.Tests
         /// <summary>
         /// Test caching
         /// </summary>
-        [Fact]
+        [SkippableFact(typeof(HttpRequestException))]
         public async Task TestDisk()
         {
             var fs = new FileStore("cache");
@@ -55,7 +56,7 @@ namespace CacheCow.Client.FileCacheStore.Tests
         /// <summary>
         ///
         /// </summary>
-        [Fact]
+        [SkippableFact(typeof(HttpRequestException))]
         public async Task TestLoad404()
         {
             var fs = new FileStore("cache");

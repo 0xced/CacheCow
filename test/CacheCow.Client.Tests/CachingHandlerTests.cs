@@ -39,13 +39,12 @@ namespace CacheCow.Client.Tests
 		}
 
 		[Fact]
-		public void Methods_Other_Than_PUT_GET_Ignored()
+		public async Task Methods_Other_Than_PUT_GET_Ignored()
 		{
 			var request = new HttpRequestMessage(HttpMethod.Delete, DummyUrl);
 			var httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
 			_messageHandler.Response = httpResponseMessage;
-			var task = _client.SendAsync(request);
-			var response = task.Result;
+            var response = await _client.SendAsync(request);
 
 			Assert.Equal(response, httpResponseMessage);
 			Assert.Null(response.Headers.CacheControl);
@@ -53,15 +52,14 @@ namespace CacheCow.Client.Tests
 		}
 
 		[Fact]
-		public void NoStore_Ignored()
+		public async Task NoStore_Ignored()
 		{
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
 			request.Headers.CacheControl = new CacheControlHeaderValue();
 			request.Headers.CacheControl.NoStore = true;
 			var httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK);
 			_messageHandler.Response = httpResponseMessage;
-			var task = _client.SendAsync(request);
-			var response = task.Result;
+            var response = await _client.SendAsync(request);
 
 			Assert.Equal(response, httpResponseMessage);
 			Assert.Null(response.Headers.CacheControl);
@@ -87,7 +85,7 @@ namespace CacheCow.Client.Tests
         }
 
         [Fact]
-		public void Get_OK_But_Not_In_Cache_To_Insert_In_Cache()
+		public async Task Get_OK_But_Not_In_Cache_To_Insert_In_Cache()
 		{
 			// setup
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
@@ -98,8 +96,7 @@ namespace CacheCow.Client.Tests
              It.Is<HttpResponseMessage>(y => y == response))).Returns(Task.FromResult(response));
 
 			// run
-			var task = _client.SendAsync(request);
-			var responseReturned = task.Result;
+            var responseReturned = await _client.SendAsync(request);
 			var header = responseReturned.Headers.Single(x=>x.Key == CacheCowHeader.Name);
 			CacheCowHeader cacheCowHeader = null;
 			CacheCowHeader.TryParse(header.Value.First() , out cacheCowHeader);
@@ -112,7 +109,7 @@ namespace CacheCow.Client.Tests
 		}
 
 		[Fact]
-		public void Get_Stale_And_In_Cache_To_Get_From_Cache()
+		public async Task Get_Stale_And_In_Cache_To_Get_From_Cache()
 		{
 			// setup
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
@@ -122,8 +119,7 @@ namespace CacheCow.Client.Tests
 
 
 			// run
-			var task = _client.SendAsync(request);
-			var responseReturned = task.Result;
+            var responseReturned = await _client.SendAsync(request);
 			var header = responseReturned.Headers.Single(x => x.Key == CacheCowHeader.Name);
 			CacheCowHeader cacheCowHeader = null;
 			CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
@@ -138,7 +134,7 @@ namespace CacheCow.Client.Tests
 
 
 		[Fact]
-		public void Get_Stale_ApplyValidation_NotModified()
+		public async Task Get_Stale_ApplyValidation_NotModified()
 		{
 			// setup
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
@@ -158,8 +154,7 @@ namespace CacheCow.Client.Tests
 
 
 			// run
-			var task = _client.SendAsync(request);
-			var responseReturned = task.Result;
+            var responseReturned = await _client.SendAsync(request);
 			var header = responseReturned.Headers.Single(x => x.Key == CacheCowHeader.Name);
 			CacheCowHeader cacheCowHeader = null;
 			CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
@@ -174,7 +169,7 @@ namespace CacheCow.Client.Tests
 		}
 
 		[Fact]
-		public void Get_Must_Revalidate_Etag_NotModified()
+		public async Task Get_Must_Revalidate_Etag_NotModified()
 		{
 			// setup
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
@@ -188,8 +183,7 @@ namespace CacheCow.Client.Tests
                 .Returns(Task.FromResult(true));
 
 			// run
-			var task = _client.SendAsync(request);
-			var responseReturned = task.Result;
+            var responseReturned = await _client.SendAsync(request);
 			var header = responseReturned.Headers.Single(x => x.Key == CacheCowHeader.Name);
 			CacheCowHeader cacheCowHeader = null;
 			CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
@@ -203,7 +197,7 @@ namespace CacheCow.Client.Tests
 		}
 
 		[Fact]
-		public void Get_Must_Revalidate_Expires_NotModified()
+		public async Task Get_Must_Revalidate_Expires_NotModified()
 		{
 			// setup
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
@@ -222,8 +216,7 @@ namespace CacheCow.Client.Tests
 
 
 			// run
-			var task = _client.SendAsync(request);
-			var responseReturned = task.Result;
+            var responseReturned = await _client.SendAsync(request);
 			var header = responseReturned.Headers.Single(x => x.Key == CacheCowHeader.Name);
 			CacheCowHeader cacheCowHeader = null;
 			CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
@@ -237,7 +230,7 @@ namespace CacheCow.Client.Tests
 		}
 
 		[Fact]
-		public void Get_Must_Revalidate_Expires_Modified()
+		public async Task Get_Must_Revalidate_Expires_Modified()
 		{
 			// setup
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
@@ -255,8 +248,7 @@ namespace CacheCow.Client.Tests
 
 
 			// run
-			var task = _client.SendAsync(request);
-			var responseReturned = task.Result;
+            var responseReturned = await _client.SendAsync(request);
 			var header = responseReturned.Headers.Single(x => x.Key == CacheCowHeader.Name);
 			CacheCowHeader cacheCowHeader = null;
 			CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
@@ -269,7 +261,7 @@ namespace CacheCow.Client.Tests
 		}
 
         [Fact]
-        public void Get_Must_Revalidate_NoCache_InRequest()
+        public async Task Get_Must_Revalidate_NoCache_InRequest()
         {
             // setup
             var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
@@ -282,8 +274,7 @@ namespace CacheCow.Client.Tests
                   It.Is<HttpResponseMessage>(r => r == responseFromServer))).Returns(Task.FromResult(true));
 
             // run
-            var task = _client.SendAsync(request);
-            var responseReturned = task.Result;
+            var responseReturned = await _client.SendAsync(request);
             var header = responseReturned.Headers.Single(x => x.Key == CacheCowHeader.Name);
             CacheCowHeader cacheCowHeader = null;
             CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
@@ -295,7 +286,7 @@ namespace CacheCow.Client.Tests
         }
 
         [Fact]
-        public void Get_NoMustRevalidate_Expires_Modified()
+        public async Task Get_NoMustRevalidate_Expires_Modified()
         {
             // setup
             var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
@@ -312,8 +303,7 @@ namespace CacheCow.Client.Tests
                   It.Is<HttpResponseMessage>(r => r == responseFromServer))).Returns(Task.FromResult(responseFromServer));
 
             // run
-            var task = _client.SendAsync(request);
-            var responseReturned = task.Result;
+            var responseReturned = await _client.SendAsync(request);
             var header = responseReturned.Headers.Single(x => x.Key == CacheCowHeader.Name);
             CacheCowHeader cacheCowHeader = null;
             CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
@@ -326,7 +316,7 @@ namespace CacheCow.Client.Tests
         }
 
         [Fact]
-        public void Get_NoCache_Expires_ResultsInValidation()
+        public async Task Get_NoCache_Expires_ResultsInValidation()
         {
             // setup
             var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
@@ -344,8 +334,7 @@ namespace CacheCow.Client.Tests
                   It.Is<HttpResponseMessage>(r => r == responseFromServer))).Returns(Task.FromResult(responseFromServer));
 
             // run
-            var task = _client.SendAsync(request);
-            var responseReturned = task.Result;
+            var responseReturned = await _client.SendAsync(request);
             var header = responseReturned.Headers.Single(x => x.Key == CacheCowHeader.Name);
             CacheCowHeader cacheCowHeader = null;
             CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
@@ -358,7 +347,7 @@ namespace CacheCow.Client.Tests
         }
 
         [Fact]
-        public void Get_NoMustRevalidate_NoMustRevalidateByDefault_Expires_GetFromCache()
+        public async Task Get_NoMustRevalidate_NoMustRevalidateByDefault_Expires_GetFromCache()
         {
             // setup
             var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
@@ -375,8 +364,7 @@ namespace CacheCow.Client.Tests
 
 
             // run
-            var task = _client.SendAsync(request);
-            var responseReturned = task.Result;
+            var responseReturned = await _client.SendAsync(request);
             var header = responseReturned.Headers.Single(x => x.Key == CacheCowHeader.Name);
             CacheCowHeader cacheCowHeader = null;
             CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
@@ -389,7 +377,7 @@ namespace CacheCow.Client.Tests
         }
 
 		[Fact]
-		public void Get_NotModified_With_Stale_Client_Cache_Shall_Update_Date_Header()
+		public async Task Get_NotModified_With_Stale_Client_Cache_Shall_Update_Date_Header()
 		{
 			// setup
 			var request = new HttpRequestMessage(HttpMethod.Get, DummyUrl);
@@ -407,7 +395,7 @@ namespace CacheCow.Client.Tests
 
 
 			// run
-            var responseReturned = _client.SendAsync(request).Result;
+            var responseReturned = await _client.SendAsync(request);
 			var header = responseReturned.Headers.Single(x => x.Key == CacheCowHeader.Name);
 			CacheCowHeader cacheCowHeader;
 			CacheCowHeader.TryParse(header.Value.First(), out cacheCowHeader);
@@ -420,7 +408,7 @@ namespace CacheCow.Client.Tests
 		}
 
 		[Fact]
-		public void Put_Validate_Etag()
+		public async Task Put_Validate_Etag()
 		{
 			// setup
 			var request = new HttpRequestMessage(HttpMethod.Put, DummyUrl);
@@ -431,8 +419,7 @@ namespace CacheCow.Client.Tests
 			_cacheStore.Setup(x => x.GetValueAsync(It.IsAny<CacheKey>())).ReturnsAsync(responseFromCache);
 
 			// run
-			var task = _client.SendAsync(request);
-			var responseReturned = task.Result;
+            var responseReturned = await _client.SendAsync(request);
 
 			// verify
 			Assert.Equal(ETagValue, request.Headers.IfMatch.First().Tag);
@@ -441,7 +428,7 @@ namespace CacheCow.Client.Tests
 		}
 
 		[Fact]
-		public void Put_Validate_Expires()
+		public async Task Put_Validate_Expires()
 		{
 			// setup
 			var request = new HttpRequestMessage(HttpMethod.Put, DummyUrl);
@@ -456,8 +443,7 @@ namespace CacheCow.Client.Tests
 
 
 			// run
-			var task = _client.SendAsync(request);
-			var responseReturned = task.Result;
+            var responseReturned = await _client.SendAsync(request);
 
 			// verify
 			Assert.Equal(lastModified.ToString(), request.Headers.IfUnmodifiedSince.Value.ToString());
@@ -466,7 +452,7 @@ namespace CacheCow.Client.Tests
 		}
 
         [Fact]
-        public void Delete_Validate_Etag()
+        public async Task Delete_Validate_Etag()
         {
             // setup
             var request = new HttpRequestMessage(HttpMethod.Delete, DummyUrl);
@@ -477,8 +463,7 @@ namespace CacheCow.Client.Tests
             _cacheStore.Setup(x => x.GetValueAsync(It.IsAny<CacheKey>())).ReturnsAsync(responseFromCache);
 
             // run
-            var task = _client.SendAsync(request);
-            var responseReturned = task.Result;
+            var responseReturned = await _client.SendAsync(request);
 
             // verify
             Assert.Equal(ETagValue, request.Headers.IfMatch.First().Tag);
@@ -487,7 +472,7 @@ namespace CacheCow.Client.Tests
         }
 
         [Fact]
-        public void Delete_Validate_Expires()
+        public async Task Delete_Validate_Expires()
         {
             // setup
             var request = new HttpRequestMessage(HttpMethod.Delete, DummyUrl);
@@ -502,8 +487,7 @@ namespace CacheCow.Client.Tests
 
 
             // run
-            var task = _client.SendAsync(request);
-            var responseReturned = task.Result;
+            var responseReturned = await _client.SendAsync(request);
 
             // verify
             Assert.Equal(lastModified.ToString(), request.Headers.IfUnmodifiedSince.Value.ToString());

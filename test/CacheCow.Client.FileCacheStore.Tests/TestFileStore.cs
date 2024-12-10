@@ -44,9 +44,9 @@ namespace CacheCow.Client.FileCacheStore.Tests
             var cachedResponse = await client.GetAsync(uri);
 
 
-            Assert.True(response.Headers.GetCacheCowHeader().ToString().Contains("did-not-exist=true"));
+            Assert.Contains("did-not-exist=true", response.Headers.GetCacheCowHeader().ToString());
             var cacheHeader = cachedResponse.Headers.GetCacheCowHeader().ToString();
-            Assert.True(cacheHeader.Contains("did-not-exist=false;retrieved-from-cache=true"));
+            Assert.Contains("did-not-exist=false;retrieved-from-cache=true", cacheHeader);
 
             await fs.ClearAsync();
             Assert.True(fs.IsEmpty());
@@ -56,16 +56,14 @@ namespace CacheCow.Client.FileCacheStore.Tests
         ///
         /// </summary>
         [Fact]
-        public void TestLoad404()
+        public async Task TestLoad404()
         {
             var fs = new FileStore("cache");
-            fs.ClearAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            await fs.ClearAsync();
             var client = fs.CreateClient();
 
 
-            var response = client.GetAsync(new Uri("https://www.openstreetmap.org/non-existin-page"))
-                .ConfigureAwait(false).GetAwaiter()
-                .GetResult();
+            var response = await client.GetAsync(new Uri("https://www.openstreetmap.org/non-existin-page"));
 
             Assert.Equal("NotFound", "" + response.StatusCode);
         }

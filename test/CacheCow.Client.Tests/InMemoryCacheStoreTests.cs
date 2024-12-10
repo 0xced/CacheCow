@@ -12,19 +12,19 @@ using System.Threading.Tasks;
 
 namespace CacheCow.Client.Tests
 {
-    
+
     public class InMemoryCacheStoreTests
     {
         private const string DummyUrl = "http://myserver/api/dummy";
 
         [Fact]
-        public void CanStore()
+        public async Task CanStore()
         {
             var store = new InMemoryCacheStore();
-            store.AddOrUpdateAsync(new CacheKey(DummyUrl, new string[0]),
-                ResponseHelper.GetOkMessage()).Wait();
+            await store.AddOrUpdateAsync(new CacheKey(DummyUrl, new string[0]),
+                ResponseHelper.GetOkMessage());
 
-            var r = store.GetValueAsync(new CacheKey(DummyUrl, new string[0])).Result;
+            var r = await store.GetValueAsync(new CacheKey(DummyUrl, new string[0]));
             Assert.NotNull(r);
         }
     }

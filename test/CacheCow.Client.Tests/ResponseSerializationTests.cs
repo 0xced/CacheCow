@@ -9,18 +9,19 @@ using CacheCow.Client;
 using CacheCow.Common;
 using Xunit;
 using System.Threading.Tasks;
+using Xunit.Abstractions;
 
 namespace CacheCow.Client.Tests
 {
 
-    public class ResponseSerializationTests
+    public class ResponseSerializationTests(ITestOutputHelper testOutput)
     {
         [Fact]
         public async Task IntegrationTest_Deserialize()
         {
             var httpClient = new HttpClient();
             var httpResponseMessage = await httpClient.GetAsync(IntegrationTests.Url);
-            Console.WriteLine(httpResponseMessage.Headers.ToString());
+            testOutput.WriteLine(httpResponseMessage.Headers.ToString());
             var defaultHttpResponseMessageSerializer = new MessageContentHttpMessageSerializer();
             var fileStream = new FileStream("msg.bin", FileMode.Create);
             await defaultHttpResponseMessageSerializer.SerializeAsync(httpResponseMessage, fileStream);

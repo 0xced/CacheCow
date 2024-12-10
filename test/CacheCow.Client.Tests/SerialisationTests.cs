@@ -9,15 +9,16 @@ using System.Threading.Tasks;
 using CacheCow.Client;
 using Xunit;
 using CacheCow.Common;
+using Xunit.Abstractions;
 
 
 namespace CacheCow.Client.Tests
 {
 
-	public class SerialisationTests
-	{
+	public class SerialisationTests(ITestOutputHelper testOutput)
+    {
 
-		[Fact]
+        [Fact]
 		public async Task Response_Deserialize_Serialize()
 		{
             using (var stream = new FileStream("Data/Response.cs", FileMode.Open))
@@ -108,7 +109,7 @@ namespace CacheCow.Client.Tests
             await serializer.SerializeAsync(response, ms);
             ms.Position = 0;
             var r2 = await serializer.DeserializeToResponseAsync(ms);
-            Console.WriteLine(response);
+            testOutput.WriteLine(response.ToString());
         }
 
 #endif

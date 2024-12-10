@@ -18,7 +18,7 @@ namespace CacheCow.Client.RedisCacheStore.Tests
         private Random _r = new Random();
 
         [SkippableFact]
-        public void AccessingLocalRedis100TimesLessThanASecond()
+        public async Task AccessingLocalRedis100TimesLessThanASecond()
         {
             var c = new RedisStore(ConnectionString);
 
@@ -29,13 +29,12 @@ namespace CacheCow.Client.RedisCacheStore.Tests
                 var buffer = new byte[_r.Next(4 * 1024, 64 * 1024)];
                 _r.NextBytes(buffer);
                 var key = new CacheKey(UrlStem + Guid.NewGuid().ToString(), new string[0]);
-                var task = c.AddOrUpdateAsync(key,
+                await c.AddOrUpdateAsync(key,
                     new HttpResponseMessage(HttpStatusCode.OK)
                     {
                         Content = new ByteArrayContent(buffer)
                     });
-                task.GetAwaiter().GetResult();
-                var r = c.GetValueAsync(key).GetAwaiter().GetResult();
+                var r = await c.GetValueAsync(key);
             }
 
             if(sw.ElapsedMilliseconds > 1000)

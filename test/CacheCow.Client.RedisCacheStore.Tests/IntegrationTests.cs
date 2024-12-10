@@ -19,7 +19,7 @@ namespace CacheCow.Client.RedisCacheStore.Tests
         private const string CacheableResource2 = "http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.2.min.js";
         private const string MaxAgeZeroResource = "https://google.com/";
 
-        [SkippableFact]
+        [SkippableFact(typeof(HttpRequestException))]
         public async Task AddItemTest()
         {
             var client = new HttpClient(new CachingHandler(new RedisStore(ConnectionString))
@@ -32,7 +32,7 @@ namespace CacheCow.Client.RedisCacheStore.Tests
             Assert.True(httpResponseMessage2.Headers.GetCacheCowHeader().RetrievedFromCache);
         }
 
-        [SkippableFact]
+        [SkippableFact(typeof(HttpRequestException))]
         public async Task ExceptionTest()
         {
             var client = new HttpClient(new CachingHandler(new RedisStore(ConnectionString, throwExceptions: false))
@@ -46,7 +46,7 @@ namespace CacheCow.Client.RedisCacheStore.Tests
             Assert.Equal(HttpStatusCode.OK, httpResponseMessage2.StatusCode);
         }
 
-        [SkippableFact]
+        [SkippableFact(typeof(HttpRequestException))]
         public async Task GetValue()
         {
             var redisStore = new RedisStore(ConnectionString);
@@ -67,7 +67,7 @@ namespace CacheCow.Client.RedisCacheStore.Tests
             testOutput.WriteLine((await redisStore.GetValueAsync(new CacheKey("http://google.com", new string[0])))?.ToString() ?? "");
         }
 
-        [SkippableFact]
+        [SkippableFact(typeof(HttpRequestException))]
         public async Task WorksWithMaxAgeZeroAndStillStoresIt()
         {
             var redisStore = new RedisStore(ConnectionString);

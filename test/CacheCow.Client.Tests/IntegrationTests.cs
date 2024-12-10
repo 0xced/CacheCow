@@ -14,7 +14,7 @@ namespace CacheCow.Client.Tests
     {
         public const string Url = "https://ssl.gstatic.com/gb/images/j_e6a6aca6.png";
 
-        [Fact]
+        [SkippableFact(typeof(HttpRequestException))]
         public async Task Test_GoogleImage_WorksOnFirstSecondRequestNotThird()
         {
             var httpClient = new HttpClient(new CachingHandler()
@@ -30,7 +30,7 @@ namespace CacheCow.Client.Tests
             Assert.Equal(true, cacheCowHeader.RetrievedFromCache);
         }
 
-        [Fact]
+        [SkippableFact(typeof(HttpRequestException))]
         public async Task Simple_Caching_Example_From_Issue263()
         {
 #if NET462
@@ -46,7 +46,7 @@ namespace CacheCow.Client.Tests
         }
 
 
-        [Fact] // Skip if the resource becomes unavailable
+        [SkippableFact(typeof(HttpRequestException))]
         public async Task Simple_Caching_Example_From_Issue267()
         {
 #if NET462
@@ -75,7 +75,7 @@ namespace CacheCow.Client.Tests
 
 
 
-        [Fact]
+        [SkippableFact(typeof(HttpRequestException))]
         public async Task SettingNoHeaderWorks()
         {
             var cachecow = new CachingHandler()

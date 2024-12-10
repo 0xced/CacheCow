@@ -16,7 +16,7 @@ namespace CacheCow.Client.Tests
 
     public class ResponseSerializationTests(ITestOutputHelper testOutput)
     {
-        [Fact]
+        [SkippableFact(typeof(HttpRequestException))]
         public async Task IntegrationTest_Deserialize()
         {
             var httpClient = new HttpClient();
@@ -32,7 +32,7 @@ namespace CacheCow.Client.Tests
             fileStream.Close();
         }
 
-        [Fact]
+        [SkippableFact(typeof(HttpRequestException))]
         public async Task IntegrationTest_Serialize_Deserialize()
         {
 #if NET462

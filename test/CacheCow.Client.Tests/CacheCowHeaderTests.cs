@@ -6,13 +6,14 @@ using System.Reflection;
 using System.Text;
 using CacheCow.Client.Headers;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace CacheCow.Client.Tests
 {
-	
-	public class CacheCowHeaderTests
-	{
-		private string _version = Assembly.GetAssembly(typeof(CacheCowHeader))
+
+	public class CacheCowHeaderTests(ITestOutputHelper testOutput)
+    {
+        private string _version = Assembly.GetAssembly(typeof(CacheCowHeader))
 				.GetName().Version.ToString();
 
 
@@ -47,7 +48,7 @@ namespace CacheCow.Client.Tests
 			                     	};
 
 			var s = cacheCowHeader.ToString();
-			Console.WriteLine(s);
+			testOutput.WriteLine(s);
 			Assert.True(s.StartsWith(_version));
 			Assert.True(s.IndexOf(CacheCowHeader.ExtensionNames.CacheValidationApplied + "=true") > 0);
 			Assert.True(s.IndexOf(CacheCowHeader.ExtensionNames.DidNotExist + "=false") > 0);

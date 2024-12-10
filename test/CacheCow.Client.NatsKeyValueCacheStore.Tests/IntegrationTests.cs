@@ -3,10 +3,11 @@ using Xunit;
 using NATS.Client;
 using CacheCow.Client.Headers;
 using CacheCow.Common;
+using Xunit.Abstractions;
 
 namespace CacheCow.Client.NatsKeyValueCacheStore.Tests
 {
-    public class IntegrationTests(NatsFixture fixture) : IClassFixture<NatsFixture>
+    public class IntegrationTests(NatsFixture fixture, ITestOutputHelper testOutput) : IClassFixture<NatsFixture>
     {
 
         private const string CacheableResource1 = "https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js";
@@ -29,7 +30,7 @@ namespace CacheCow.Client.NatsKeyValueCacheStore.Tests
         }
 
         [SkippableFact]
-        public async void AddItemTest()
+        public async Task AddItemTest()
         {
             var redisStore = GetKeyValueStore();
             var client = new HttpClient(new CachingHandler(redisStore)
@@ -39,11 +40,11 @@ namespace CacheCow.Client.NatsKeyValueCacheStore.Tests
 
             var httpResponseMessage = await client.GetAsync(CacheableResource1);
             var httpResponseMessage2 = await client.GetAsync(CacheableResource1);
-            Assert.True(httpResponseMessage2.Headers.GetCacheCowHeader().RetrievedFromCache.Value);
+            Assert.True(httpResponseMessage2.Headers.GetCacheCowHeader().RetrievedFromCache);
         }
 
         [SkippableFact]
-        public async void ExceptionTest()
+        public async Task ExceptionTest()
         {
             var redisStore = GetKeyValueStore();
             var client = new HttpClient(new CachingHandler(redisStore)
@@ -58,7 +59,7 @@ namespace CacheCow.Client.NatsKeyValueCacheStore.Tests
         }
 
         [SkippableFact]
-        public async void GetValue()
+        public async Task GetValue()
         {
             var redisStore = GetKeyValueStore();
             var client = new HttpClient(new CachingHandler(redisStore)
@@ -67,20 +68,21 @@ namespace CacheCow.Client.NatsKeyValueCacheStore.Tests
             });
 
             var httpResponseMessage = await client.GetAsync(CacheableResource1);
-            var response = redisStore.GetValueAsync(new CacheKey(CacheableResource1, new string[0])).Result;
+            var response = await redisStore.GetValueAsync(new CacheKey(CacheableResource1, new string[0]));
             Assert.NotNull(response);
         }
 
         [SkippableFact]
-        public void TestConnectivity()
+        public async Task TestConnectivity()
         {
             var redisStore = GetKeyValueStore();
             HttpResponseMessage responseMessage = null;
-            Console.WriteLine(redisStore.GetValueAsync(new CacheKey("http://google.com", new string[0])).Result);
+            var httpResponseMessage = await redisStore.GetValueAsync(new CacheKey("http://google.com", new string[0]));
+            testOutput.WriteLine(httpResponseMessage?.ToString() ?? "");
         }
 
         [SkippableFact]
-        public void WorksWithMaxAgeZeroAndStillStoresIt()
+        public async Task WorksWithMaxAgeZeroAndStillStoresIt()
         {
             var redisStore = GetKeyValueStore();
             var client = new HttpClient(new CachingHandler(redisStore)
@@ -89,9 +91,9 @@ namespace CacheCow.Client.NatsKeyValueCacheStore.Tests
                 DefaultVaryHeaders = new string[0]
             });
 
-            var httpResponseMessage = client.GetAsync(MaxAgeZeroResource).Result;
+            var httpResponseMessage = await client.GetAsync(MaxAgeZeroResource);
             var key = new CacheKey(MaxAgeZeroResource, new string[0]);
-            var response = redisStore.GetValueAsync(key).Result;
+            var response = await redisStore.GetValueAsync(key);
             Assert.NotNull(response);
         }
     }

@@ -14,7 +14,7 @@ using Xunit.Abstractions;
 
 namespace CacheCow.Server.Core.Mvc.Tests
 {
-    public class KestrelTests : ILoggerProvider, ILogger, IDisposable
+    public class KestrelTests : ILoggerProvider, ILogger, IAsyncLifetime
     {
         private const int PORT_NUMBER = 12309;
 
@@ -36,7 +36,20 @@ namespace CacheCow.Server.Core.Mvc.Tests
                 })
                 .UseStartup<WithCustomExtractorStartup>()
                 .Build();
-            _host.Start();
+        }
+
+        async Task IAsyncLifetime.InitializeAsync()
+        {
+            await _host.StartAsync();
+        }
+
+        async Task IAsyncLifetime.DisposeAsync()
+        {
+            if (_host != null)
+            {
+                await _host.StopAsync();
+                _host?.Dispose();
+            }
         }
 
         [Fact]
@@ -61,8 +74,6 @@ namespace CacheCow.Server.Core.Mvc.Tests
 
         public void Dispose()
         {
-            _host?.StopAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-            _host?.Dispose();
         }
 
         public ILogger CreateLogger(string categoryName)

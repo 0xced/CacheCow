@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Xunit;
 using CacheCow.Client.Headers;
 using CacheCow.Client.Tests.Helper;
+using Xunit.Abstractions;
 
 namespace CacheCow.Client.Tests
 {
@@ -17,15 +18,17 @@ namespace CacheCow.Client.Tests
     /// Difference of these tests is that it uses in-memory message handler
     /// </summary>
     public class FauxServerTests
-    {       
+    {
+        private readonly ITestOutputHelper _testOutput;
         private DummyMessageHandler _dummyHandler = new DummyMessageHandler();
         private HttpClient _httpClient;
         private const string DummyUrl = "http://myserver/api/dummy";
         private const string ETagValue = "\"abcdef\"";
         private InMemoryCacheStore _store = new InMemoryCacheStore();
 
-        public FauxServerTests()
+        public FauxServerTests(ITestOutputHelper testOutput)
         {
+            _testOutput = testOutput;
 
             var _cachingHandler = new CachingHandler(_store)
             {
@@ -53,21 +56,19 @@ namespace CacheCow.Client.Tests
 
             // first caching
             response = await _httpClient.GetAsync(DummyUrl);
-            Console.WriteLine(response.Headers.GetCacheCowHeader().ToString());
-            Assert.NotNull(response.Headers.GetCacheCowHeader().RetrievedFromCache);
-            Assert.True(response.Headers.GetCacheCowHeader().RetrievedFromCache.Value);
+            _testOutput.WriteLine(response.Headers.GetCacheCowHeader().ToString());
+            Assert.True(response.Headers.GetCacheCowHeader().RetrievedFromCache);
 
             // stale go getter
             Thread.Sleep(1500);
             _dummyHandler.Response = ResponseHelper.GetOkMessage(1, true);
             response = await _httpClient.GetAsync(DummyUrl);
-            Console.WriteLine(response.Headers.GetCacheCowHeader().ToString());
-            Assert.NotNull(response.Headers.GetCacheCowHeader().DidNotExist);
-            Assert.True(response.Headers.GetCacheCowHeader().DidNotExist.Value);
+            _testOutput.WriteLine(response.Headers.GetCacheCowHeader().ToString());
+            Assert.True(response.Headers.GetCacheCowHeader().DidNotExist);
 
             // immediate, get it from cache - short circuit
             response = await _httpClient.GetAsync(DummyUrl);
-            Console.WriteLine(response.Headers.GetCacheCowHeader().ToString());
+            _testOutput.WriteLine(response.Headers.GetCacheCowHeader().ToString());
             Assert.Null(response.Headers.GetCacheCowHeader().WasStale);
         }
 

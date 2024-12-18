@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>net8.0</TargetFrameworks>
 		<TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net462;$(TargetFrameworks)</TargetFrameworks>
@@ -14,19 +14,11 @@
 		<Compile Include="..\..\src\common\TraceWriter.cs" Link="TraceWriter.cs" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
-	</ItemGroup>
-	<ItemGroup Condition=" '$(TargetFramework)' != 'net462' ">
-		<PackageReference Include="xunit" Version="2.4.2" />
-		<PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+		<PackageReference Include="xunit" Version="2.9.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="3.0.0" PrivateAssets="all" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\CacheCow.Common\CacheCow.Common.csproj" />
-	</ItemGroup>
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
-		<Reference Include="System" />
-		<PackageReference Include="xunit" Version="2.3.1" />
-		<PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
 	</ItemGroup>
 </Project>

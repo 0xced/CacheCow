@@ -11,14 +11,13 @@ using System.Diagnostics;
 
 namespace CacheCow.Client.RedisCacheStore.Tests
 {
-    
-    public class PerfTest
+
+    public class PerfTest(RedisFixture fixture) : RedisTestBase(fixture)
     {
-        private const string ConnectionString = "localhost";
         private const string UrlStem = "http://foofoo.com/";
         private Random _r = new Random();
 
-        [Fact(Skip = "Requires local redis running")]
+        [SkippableFact]
         public void AccessingLocalRedis100TimesLessThanASecond()
         {
             var c = new RedisStore(ConnectionString);

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using Xunit;
 using NATS.Client;
 using CacheCow.Client.Headers;
@@ -7,31 +6,33 @@ using CacheCow.Common;
 
 namespace CacheCow.Client.NatsKeyValueCacheStore.Tests
 {
-    public class IntegrationTests
+    public class IntegrationTests(NatsFixture fixture) : IClassFixture<NatsFixture>
     {
 
         private const string CacheableResource1 = "https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js";
         private const string CacheableResource2 = "http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.2.min.js";
-        private const string ConnectionString = "nats://0.0.0.0:59039";
         private const string MaxAgeZeroResource = "https://google.com/";
         private const string BucketName = "vavavoom";
-        private const string SkipText = "Run manually"; // NOTE: Change to NULL to run the tests and the back to "Run manually"
 
-
-        private Options _options;
-
-        public IntegrationTests()
+        private NatsKeyValueStore GetKeyValueStore()
         {
-            _options = ConnectionFactory.GetDefaultOptions();
-            _options.Url = ConnectionString;
-            _options.User = "local";
-            _options.Password = "ZcQOmbdc0GuZEsRwvgfWKGAPVtOhjHTc"; // CHANGE ACCORDING TO YOUR ENVIRONMENT
+            var options = ConnectionFactory.GetDefaultOptions();
+            try
+            {
+                options.Url = fixture.Container.GetConnectionString();
+            }
+            catch (ArgumentException e) when (e.ParamName == "DockerEndpointAuthConfig")
+            {
+                throw new SkipException(e.Message, e);
+            }
+            return new NatsKeyValueStore(BucketName, options);
         }
 
-        [Fact(Skip = SkipText)]
+        [SkippableFact]
         public async void AddItemTest()
         {
-            var client = new HttpClient(new CachingHandler(new NatsKeyValueStore(BucketName, _options))
+            var redisStore = GetKeyValueStore();
+            var client = new HttpClient(new CachingHandler(redisStore)
             {
                 InnerHandler = new HttpClientHandler()
             });
@@ -41,10 +42,11 @@ namespace CacheCow.Client.NatsKeyValueCacheStore.Tests
             Assert.True(httpResponseMessage2.Headers.GetCacheCowHeader().RetrievedFromCache.Value);
         }
 
-        [Fact(Skip = SkipText)]
+        [SkippableFact]
         public async void ExceptionTest()
         {
-            var client = new HttpClient(new CachingHandler(new NatsKeyValueStore(BucketName, _options))
+            var redisStore = GetKeyValueStore();
+            var client = new HttpClient(new CachingHandler(redisStore)
             {
                 InnerHandler = new HttpClientHandler()
             });
@@ -55,10 +57,10 @@ namespace CacheCow.Client.NatsKeyValueCacheStore.Tests
             Assert.Equal(HttpStatusCode.OK, httpResponseMessage2.StatusCode);
         }
 
-        [Fact(Skip = SkipText)]
+        [SkippableFact]
         public async void GetValue()
         {
-            var redisStore = new NatsKeyValueStore(BucketName, _options);
+            var redisStore = GetKeyValueStore();
             var client = new HttpClient(new CachingHandler(redisStore)
             {
                 InnerHandler = new HttpClientHandler()
@@ -69,18 +71,18 @@ namespace CacheCow.Client.NatsKeyValueCacheStore.Tests
             Assert.NotNull(response);
         }
 
-        [Fact(Skip = SkipText)]
+        [SkippableFact]
         public void TestConnectivity()
         {
-            var redisStore = new NatsKeyValueStore(BucketName, _options);
+            var redisStore = GetKeyValueStore();
             HttpResponseMessage responseMessage = null;
             Console.WriteLine(redisStore.GetValueAsync(new CacheKey("http://google.com", new string[0])).Result);
         }
 
-        [Fact(Skip = SkipText)]
+        [SkippableFact]
         public void WorksWithMaxAgeZeroAndStillStoresIt()
         {
-            var redisStore = new NatsKeyValueStore(BucketName, _options);
+            var redisStore = GetKeyValueStore();
             var client = new HttpClient(new CachingHandler(redisStore)
             {
                 InnerHandler = new HttpClientHandler(),

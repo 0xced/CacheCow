@@ -8,17 +8,16 @@ using Xunit;
 namespace CacheCow.Client.RedisCacheStore.Tests
 {
     /// <summary>
-    /// READ!! ------------------ These tests require Redis running on localhost and access to internet
+    /// READ!! ------------------ These tests require Docker running and access to internet
     /// </summary>
 
-    public class IntegrationTests
+    public class IntegrationTests(RedisFixture fixture) : RedisTestBase(fixture)
     {
         private const string CacheableResource1 = "https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js";
         private const string CacheableResource2 = "http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.2.min.js";
-        private const string ConnectionString = "localhost";
         private const string MaxAgeZeroResource = "https://google.com/";
 
-        [Fact(Skip = "Run manually")]
+        [SkippableFact]
         public void AddItemTest()
         {
             var client = new HttpClient(new CachingHandler(new RedisStore(ConnectionString))
@@ -31,7 +30,7 @@ namespace CacheCow.Client.RedisCacheStore.Tests
             Assert.True(httpResponseMessage2.Headers.GetCacheCowHeader().RetrievedFromCache.Value);
         }
 
-        [Fact(Skip = "Run manually")]
+        [SkippableFact]
         public void ExceptionTest()
         {
             var client = new HttpClient(new CachingHandler(new RedisStore(ConnectionString, throwExceptions: false))
@@ -45,7 +44,7 @@ namespace CacheCow.Client.RedisCacheStore.Tests
             Assert.Equal(HttpStatusCode.OK, httpResponseMessage2.StatusCode);
         }
 
-        [Fact(Skip = "Run manually")]
+        [SkippableFact]
         public void GetValue()
         {
             var redisStore = new RedisStore(ConnectionString);
@@ -59,7 +58,7 @@ namespace CacheCow.Client.RedisCacheStore.Tests
             Assert.NotNull(response);
         }
 
-        [Fact(Skip = "Run manually")]
+        [SkippableFact]
         public void TestConnectivity()
         {
             var redisStore = new RedisStore(ConnectionString);
@@ -67,7 +66,7 @@ namespace CacheCow.Client.RedisCacheStore.Tests
             Console.WriteLine(redisStore.GetValueAsync(new CacheKey("http://google.com", new string[0])).Result);
         }
 
-        [Fact(Skip = "Run manually")]
+        [SkippableFact]
         public void WorksWithMaxAgeZeroAndStillStoresIt()
         {
             var redisStore = new RedisStore(ConnectionString);
